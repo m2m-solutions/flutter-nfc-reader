@@ -5,8 +5,7 @@ import VYNFCKit
 
 @available(iOS 11.0, *)
 public class SwiftFlutterNfcReaderPlugin: NSObject, FlutterPlugin {
-    
-    fileprivate var nfcSession: NFCNDEFReaderSession? = nil
+    fileprivate var nfcSession: NFCTagReaderSession? = nil
     fileprivate var instruction: String? = nil
     fileprivate var resulter: FlutterResult? = nil
     fileprivate var readResult: FlutterResult? = nil
@@ -57,7 +56,11 @@ extension SwiftFlutterNfcReaderPlugin {
     func activateNFC(_ instruction: String?) {
         print("activate")
         
-        nfcSession = NFCNDEFReaderSession(delegate: self, queue: DispatchQueue(label: "queueName", attributes: .concurrent), invalidateAfterFirstRead: true)
+        nfcSession = NFCTagReaderSession(
+            pollingOption: [.iso14443, .iso15693, .iso18092]
+            delegate: self, 
+            queue: DispatchQueue(label: "queueName", attributes: .concurrent)
+        )
         
         // then setup a new session
         if let instruction = instruction {
@@ -68,11 +71,9 @@ extension SwiftFlutterNfcReaderPlugin {
         if let nfcSession = nfcSession {
             nfcSession.begin()
         }
-        
     }
     
     func disableNFC() {
-        //nfcSession?.invalidate()
         let data = [kId: "", kContent: "", kError: "", kStatus: "stopped"]
         
         resulter?(data)
@@ -89,72 +90,24 @@ extension SwiftFlutterNfcReaderPlugin {
 
 // MARK: - NFCDelegate
 @available(iOS 11.0, *)
-extension SwiftFlutterNfcReaderPlugin : NFCNDEFReaderSessionDelegate {
-    
-    public func readerSession(_ session: NFCNDEFReaderSession, didDetectNDEFs messages: [NFCNDEFMessage]) {
+extension SwiftFlutterNfcReaderPlugin : NFCTagReaderSessionDelegate {
+    public func readerSession(_ session: NFCTagReaderSession, didDetect tags: [__NFCTag]) {
         print(messages)
-        guard let message = messages.first else { return }
-        guard let payload = message.records.first else { return }
+        let id = tags.first.icManufacturerCode
+        var st = "0x" + String(format:"%02X", id)
         
-        print(payload.identifier as NSData)
-        
-        // Start Package
-        
-        let parsedPayload = VYNFCNDEFPayloadParser.parse(payload)
-        var text = ""
-        var urlString = ""
-        
-        if let parsedPayload = parsedPayload as? VYNFCNDEFTextPayload {
-            // text = "[Text payload]\n"
-            text = String(format: "%@%@", text, parsedPayload.text)
-        } else if let parsedPayload = parsedPayload as? VYNFCNDEFURIPayload {
-            // text = "[URI payload]\n"
-            text = String(format: "%@%@", text, parsedPayload.uriString)
-            urlString = parsedPayload.uriString
-        } else if let parsedPayload = parsedPayload as? VYNFCNDEFTextXVCardPayload {
-            // text = "[TextXVCard payload]\n"
-            text = String(format: "%@%@", text, parsedPayload.text)
-        } else if let sp = parsedPayload as? VYNFCNDEFSmartPosterPayload {
-            // text = "[SmartPoster payload]\n"
-            for textPayload in sp.payloadTexts {
-                if let textPayload = textPayload as? VYNFCNDEFTextPayload {
-                    text = String(format: "%@%@\n", text, textPayload.text)
-                }
-            }
-            text = String(format: "%@%@", text, sp.payloadURI.uriString)
-            urlString = sp.payloadURI.uriString
-        } else if let wifi = parsedPayload as? VYNFCNDEFWifiSimpleConfigPayload {
-            for case let credential as VYNFCNDEFWifiSimpleConfigCredential in wifi.credentials {
-                text = String(format: "%@SSID: %@\nPassword: %@\nMac Address: %@\nAuth Type: %@\nEncrypt Type: %@",
-                              text, credential.ssid, credential.networkKey, credential.macAddress,
-                              VYNFCNDEFWifiSimpleConfigCredential.authTypeString(credential.authType),
-                              VYNFCNDEFWifiSimpleConfigCredential.encryptTypeString(credential.encryptType)
-                )
-            }
-            if let version2 = wifi.version2 {
-                text = String(format: "%@\nVersion2: %@", text, version2.version)
-            }
-        } else {
-            text = "";
-        }
-        print(text)
-        
-        // end package
-        
-        let data = [kId: "", kContent: text, kError: "", kStatus: "reading"]
+        let data = [kId: st, kContent: "notimplemented", kError: "", kStatus: "reading"]
         sendNfcEvent(data: data);
         readResult?(data)
         readResult=nil
-        //disableNFC()
     }
     
-    public func readerSession(_ session: NFCNDEFReaderSession, didInvalidateWithError error: Error) {
+    public func readerSession(_ session: NFCTagReaderSession, didInvalidateWithError error: Error) {
         print(error.localizedDescription)
         let data = [kId: "", kContent: "", kError: error.localizedDescription, kStatus: "error"]
         resulter?(data)
         disableNFC()
     }
-    
 }
 
 @available(iOS 11.0, *)
