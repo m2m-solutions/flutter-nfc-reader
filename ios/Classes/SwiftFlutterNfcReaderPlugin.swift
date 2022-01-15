@@ -38,7 +38,7 @@ public class SwiftFlutterNfcReaderPlugin: NSObject, FlutterPlugin {
             resulter = result
             disableNFC()
         case "NfcWrite":
-            var alertController = UIAlertController(title: nil, message: "IOS does not support NFC tag writing", preferredStyle: .alert)
+            let alertController = UIAlertController(title: nil, message: "IOS does not support NFC tag writing", preferredStyle: .alert)
             alertController.addAction(UIAlertAction(title: "OK", style: .default, handler: nil))
             UIApplication.shared.keyWindow?.rootViewController?.present(alertController, animated: true)
         case "NfcAvailable":
@@ -57,7 +57,7 @@ extension SwiftFlutterNfcReaderPlugin {
         print("activate")
         
         nfcSession = NFCTagReaderSession(
-            pollingOption: [.iso14443, .iso15693, .iso18092]
+            pollingOption: [.iso14443, .iso15693, .iso18092],
             delegate: self, 
             queue: DispatchQueue(label: "queueName", attributes: .concurrent)
         )
