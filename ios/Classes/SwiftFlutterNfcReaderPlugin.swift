@@ -110,6 +110,7 @@ extension SwiftFlutterNfcReaderPlugin : NFCTagReaderSessionDelegate {
         sendNfcEvent(data: data);
         readResult?(data)
         readResult=nil
+        session.invalidate()
     }
     
     public func tagReaderSession(_ session: NFCTagReaderSession, didInvalidateWithError error: Error) {
