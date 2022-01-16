@@ -96,12 +96,15 @@ extension SwiftFlutterNfcReaderPlugin : NFCTagReaderSessionDelegate {
     }
 
     public func tagReaderSession(_ session: NFCTagReaderSession, didDetect tags: [NFCTag]) {
-        print(tags)
-        print(tags.first)
-        let tag = tags.first as! NFCISO15693Tag
-        print(tag)
+        let tag = tags.first
+        guard case .iso14443(let iso14443Tag) = tag else {continue}
 
-        let id = "0x" + tag.icSerialNumber.hexEncodedString()
+        let id = "0x" + iso14443Tag.icSerialNumber
+            .reversed()
+            .map { (data) -> String in
+                return String(format: "%02x", data)
+            }
+            .joined()
         
         let data = [kId: id, kContent: "notimplemented", kError: "", kStatus: "reading"]
         sendNfcEvent(data: data);
@@ -127,11 +130,5 @@ extension SwiftFlutterNfcReaderPlugin: FlutterStreamHandler {
     public func onListen(withArguments arguments: Any?, eventSink events: @escaping FlutterEventSink) -> FlutterError? {
         self.eventSink = events
         return nil
-    }
-}
-
-extension Data {
-    func hexEncodedString() -> String {
-        return self.map { String(format: "%02hhx", $0) }.joined()
     }
 }
