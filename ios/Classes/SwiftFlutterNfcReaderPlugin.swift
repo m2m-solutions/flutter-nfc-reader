@@ -97,7 +97,7 @@ extension SwiftFlutterNfcReaderPlugin : NFCTagReaderSessionDelegate {
 
     public func tagReaderSession(_ session: NFCTagReaderSession, didDetect tags: [NFCTag]) {
         let tag = tags.first!
-        guard case .miFare(mifareTag) = tag else {return}
+        guard case .miFare(let mifareTag) = tag else {return}
 
         let id = "0x" + mifareTag.identifier
             .reversed()
