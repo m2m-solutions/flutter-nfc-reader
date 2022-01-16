@@ -100,7 +100,6 @@ extension SwiftFlutterNfcReaderPlugin : NFCTagReaderSessionDelegate {
         guard case .miFare(let mifareTag) = tag else {return}
 
         let id = "0x" + mifareTag.identifier
-            .reversed()
             .map { (data) -> String in
                 return String(format: "%02x", data)
             }
