@@ -57,7 +57,7 @@ extension SwiftFlutterNfcReaderPlugin {
         print("activate")
         
         nfcSession = NFCTagReaderSession(
-            pollingOption: [.iso14443, .iso15693, .iso18092],
+            pollingOption: [.iso14443],
             delegate: self, 
             queue: DispatchQueue(label: "queueName", attributes: .concurrent)
         )
@@ -97,11 +97,20 @@ extension SwiftFlutterNfcReaderPlugin : NFCTagReaderSessionDelegate {
 
     public func tagReaderSession(_ session: NFCTagReaderSession, didDetect tags: [NFCTag]) {
         print(tags)
+        print(tags.first)
         let tag = tags.first as! NFCISO15693Tag
-        let id = tag.icManufacturerCode
-        let st = "0x" + String(format:"%02X", id)
+        print(tag)
+
+        let id = tag.icSerialNumber
+        let buffer = UnsafeBufferPointer<UInt8>(start: UnsafePointer(id.bytes),
+                                                count: id.length)
+        let formatString = "%02x"
+        let bytesAsHexStrings = buffer.map {
+            String(format: formatString, $0)
+        }
+        let idString = "0x" + bytesAsHexStrings.joinWithSeparator("")
         
-        let data = [kId: st, kContent: "notimplemented", kError: "", kStatus: "reading"]
+        let data = [kId: idString, kContent: "notimplemented", kError: "", kStatus: "reading"]
         sendNfcEvent(data: data);
         readResult?(data)
         readResult=nil
