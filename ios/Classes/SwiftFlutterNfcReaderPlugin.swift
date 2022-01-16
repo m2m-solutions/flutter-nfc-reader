@@ -101,16 +101,9 @@ extension SwiftFlutterNfcReaderPlugin : NFCTagReaderSessionDelegate {
         let tag = tags.first as! NFCISO15693Tag
         print(tag)
 
-        let id = tag.icSerialNumber
-        let buffer = UnsafeBufferPointer<UInt8>(start: UnsafePointer(id.bytes),
-                                                count: id.length)
-        let formatString = "%02x"
-        let bytesAsHexStrings = buffer.map {
-            String(format: formatString, $0)
-        }
-        let idString = "0x" + bytesAsHexStrings.joinWithSeparator("")
+        let id = "0x" + tag.icSerialNumber.hexEncodedString()
         
-        let data = [kId: idString, kContent: "notimplemented", kError: "", kStatus: "reading"]
+        let data = [kId: id, kContent: "notimplemented", kError: "", kStatus: "reading"]
         sendNfcEvent(data: data);
         readResult?(data)
         readResult=nil
@@ -134,5 +127,11 @@ extension SwiftFlutterNfcReaderPlugin: FlutterStreamHandler {
     public func onListen(withArguments arguments: Any?, eventSink events: @escaping FlutterEventSink) -> FlutterError? {
         self.eventSink = events
         return nil
+    }
+}
+
+extension Data {
+    func hexEncodedString() -> String {
+        return self.map { String(format: "%02hhx", $0) }.joined()
     }
 }
