@@ -93,7 +93,8 @@ extension SwiftFlutterNfcReaderPlugin {
 extension SwiftFlutterNfcReaderPlugin : NFCTagReaderSessionDelegate {
     public func readerSession(_ session: NFCTagReaderSession, didDetect tags: [__NFCTag]) {
         print(messages)
-        let id = tags.first.icManufacturerCode
+        let tag = tags.first as! NFCISO15693Tag
+        let id = tag.icManufacturerCode
         var st = "0x" + String(format:"%02X", id)
         
         let data = [kId: st, kContent: "notimplemented", kError: "", kStatus: "reading"]
