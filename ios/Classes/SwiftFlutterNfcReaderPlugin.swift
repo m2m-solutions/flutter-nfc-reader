@@ -42,7 +42,7 @@ public class SwiftFlutterNfcReaderPlugin: NSObject, FlutterPlugin {
             alertController.addAction(UIAlertAction(title: "OK", style: .default, handler: nil))
             UIApplication.shared.keyWindow?.rootViewController?.present(alertController, animated: true)
         case "NfcAvailable":
-            var nfcAvailable = NFCNDEFReaderSession.readingAvailable
+        let nfcAvailable = NFCNDEFReaderSession.readingAvailable
             result(nfcAvailable ? "available" : "not_supported")
         default:
             result("iOS " + UIDevice.current.systemVersion)
@@ -95,11 +95,11 @@ extension SwiftFlutterNfcReaderPlugin : NFCTagReaderSessionDelegate {
 
     }
 
-    public func tagReaderSession(_ session: NFCTagReaderSession, didDetect tags: [__NFCTag]) {
+    public func tagReaderSession(_ session: NFCTagReaderSession, didDetect tags: [NFCTag]) {
         print(tags)
         let tag = tags.first as! NFCISO15693Tag
         let id = tag.icManufacturerCode
-        var st = "0x" + String(format:"%02X", id)
+        let st = "0x" + String(format:"%02X", id)
         
         let data = [kId: st, kContent: "notimplemented", kError: "", kStatus: "reading"]
         sendNfcEvent(data: data);
