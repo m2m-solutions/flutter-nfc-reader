@@ -91,7 +91,7 @@ extension SwiftFlutterNfcReaderPlugin {
 // MARK: - NFCDelegate
 @available(iOS 11.0, *)
 extension SwiftFlutterNfcReaderPlugin : NFCTagReaderSessionDelegate {
-    func tagReaderSessionDidBecomeActive(_ session: NFCTagReaderSession) {
+    public func tagReaderSessionDidBecomeActive(_ session: NFCTagReaderSession) {
 
     }
 
