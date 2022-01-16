@@ -91,7 +91,11 @@ extension SwiftFlutterNfcReaderPlugin {
 // MARK: - NFCDelegate
 @available(iOS 11.0, *)
 extension SwiftFlutterNfcReaderPlugin : NFCTagReaderSessionDelegate {
-    public func readerSession(_ session: NFCTagReaderSession, didDetect tags: [__NFCTag]) {
+    func tagReaderSessionDidBecomeActive(_ session: NFCTagReaderSession) {
+
+    }
+
+    public func tagReaderSession(_ session: NFCTagReaderSession, didDetect tags: [__NFCTag]) {
         print(tags)
         let tag = tags.first as! NFCISO15693Tag
         let id = tag.icManufacturerCode
@@ -103,7 +107,7 @@ extension SwiftFlutterNfcReaderPlugin : NFCTagReaderSessionDelegate {
         readResult=nil
     }
     
-    public func readerSession(_ session: NFCTagReaderSession, didInvalidateWithError error: Error) {
+    public func tagReaderSession(_ session: NFCTagReaderSession, didInvalidateWithError error: Error) {
         print(error.localizedDescription)
         let data = [kId: "", kContent: "", kError: error.localizedDescription, kStatus: "error"]
         resulter?(data)
