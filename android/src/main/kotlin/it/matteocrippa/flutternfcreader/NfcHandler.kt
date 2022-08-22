@@ -100,8 +100,9 @@ private fun ByteArray.bytesToHexString(): String? {
 private fun Tag.read(callback: (Map<*, *>) -> Unit) {
     // convert tag to NDEF tag
     val ndef = Ndef.get(this)
+    val id = id.bytesToHexString()
     if (ndef == null) {
-        callback(mapOf(kId to null, kContent to null, kError to "failed to get NDEF", kStatus to "error"))
+        callback(mapOf(kId to id, kContent to null, kError to "failed to get NDEF", kStatus to "error"))
         return
     }
     ndef.connect()
@@ -111,7 +112,6 @@ private fun Tag.read(callback: (Map<*, *>) -> Unit) {
         message = ndefMessage.toByteArray()
             .toString(Charsets.UTF_8)
     }
-    val id = id.bytesToHexString()
     ndef.close()
     val data = mapOf(kId to id, kContent to message, kError to "", kStatus to "reading")
     val mainHandler = Handler(Looper.getMainLooper())
