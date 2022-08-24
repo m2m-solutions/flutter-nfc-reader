@@ -97,11 +97,20 @@ extension SwiftFlutterNfcReaderPlugin : NFCTagReaderSessionDelegate {
 
     public func tagReaderSession(_ session: NFCTagReaderSession, didDetect tags: [NFCTag]) {
         let tag = tags.first!
-        // if case .miFare(let nfcTag) = tag
-        // else if case .iso15693(let nfcTag) = tag
-        // else {return}
 
-        let id = "0x" + tag.identifier
+        // probably a better way to do this but i cant
+        // be bothered to learn swift
+        let identifier: Data;
+        switch tag {
+            case .miFare(let nfcTag)
+                identifier = nfcTag.identifier
+            case iso15693(let nfcTag)
+                identifier = nfcTag.identifier
+            default:
+                return
+        }
+
+        let id = "0x" + identifier
             .map { (data) -> String in
                 return String(format: "%02x", data)
             }
