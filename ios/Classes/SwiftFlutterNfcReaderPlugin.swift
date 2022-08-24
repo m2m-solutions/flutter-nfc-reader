@@ -104,7 +104,7 @@ extension SwiftFlutterNfcReaderPlugin : NFCTagReaderSessionDelegate {
         switch tag {
             case .miFare(let nfcTag)
                 identifier = nfcTag.identifier
-            case iso15693(let nfcTag)
+            case .iso15693(let nfcTag)
                 identifier = nfcTag.identifier
             default:
                 return
