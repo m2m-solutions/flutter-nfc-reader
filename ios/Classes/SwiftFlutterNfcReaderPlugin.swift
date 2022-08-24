@@ -57,7 +57,7 @@ extension SwiftFlutterNfcReaderPlugin {
         print("activate")
         
         nfcSession = NFCTagReaderSession(
-            pollingOption: [.iso14443],
+            pollingOption: [.iso14443, .iso15693],
             delegate: self, 
             queue: DispatchQueue(label: "queueName", attributes: .concurrent)
         )
@@ -97,7 +97,9 @@ extension SwiftFlutterNfcReaderPlugin : NFCTagReaderSessionDelegate {
 
     public func tagReaderSession(_ session: NFCTagReaderSession, didDetect tags: [NFCTag]) {
         let tag = tags.first!
-        guard case .miFare(let mifareTag) = tag else {return}
+        if case .miFare(let mifareTag) = tag
+        else if case .iso15693(let mifareTag) = tag
+        else {return}
 
         let id = "0x" + mifareTag.identifier
             .map { (data) -> String in
