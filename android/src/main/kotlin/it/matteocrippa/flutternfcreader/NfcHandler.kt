@@ -100,7 +100,9 @@ private fun ByteArray.bytesToHexString(): String? {
 private fun Tag.read(callback: (Map<*, *>) -> Unit) {
     // convert tag to NDEF tag
     val ndef = Ndef.get(this)
-    val id = id.bytesToHexString()
+
+    // reverse array to convert to big-endian to match CoreNFC implementation of ISO 15693
+    val id = id.reverse().bytesToHexString()
     if (ndef == null) {
         callback(mapOf(kId to id, kContent to null, kError to "failed to get NDEF", kStatus to "error"))
         return
