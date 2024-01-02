@@ -102,7 +102,7 @@ private fun Tag.read(callback: (Map<*, *>) -> Unit) {
     val ndef = Ndef.get(this)
 
     // reverse array to convert to big-endian to match CoreNFC implementation of ISO 15693
-    val id = this.getId().asReversed().bytesToHexString()
+    val id = this.getId().reversedArray().bytesToHexString()
     if (ndef == null) {
         callback(mapOf(kId to id, kContent to null, kError to "failed to get NDEF", kStatus to "error"))
         return
