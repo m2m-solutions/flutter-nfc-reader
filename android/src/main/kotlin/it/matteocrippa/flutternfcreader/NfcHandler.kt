@@ -100,9 +100,15 @@ private fun ByteArray.bytesToHexString(): String? {
 private fun Tag.read(callback: (Map<*, *>) -> Unit) {
     // convert tag to NDEF tag
     val ndef = Ndef.get(this)
-
-    // reverse array to convert to big-endian to match CoreNFC implementation of ISO 15693
-    val id = this.getId().reversedArray().bytesToHexString()
+    // Check if the tag supports NfcV (ISO 15693)
+    val isNfcV = this.techList.contains("android.nfc.tech.NfcV")
+    // Get the ID from the tag, reverse only if it's NfcV (ISO 15693)
+    val id = if (isNfcV) {
+        // reverse array to convert to big-endian to match CoreNFC implementation of ISO 15693
+        this.id.reversedArray().bytesToHexString()
+    } else {
+        this.id.bytesToHexString()
+    }
     if (ndef == null) {
         callback(mapOf(kId to id, kContent to null, kError to "failed to get NDEF", kStatus to "error"))
         return
@@ -110,9 +116,8 @@ private fun Tag.read(callback: (Map<*, *>) -> Unit) {
     ndef.connect()
     val ndefMessage = ndef.ndefMessage ?: ndef.cachedNdefMessage
     var message = ""
-    if(ndefMessage != null) {
-        message = ndefMessage.toByteArray()
-            .toString(Charsets.UTF_8)
+    if (ndefMessage != null) {
+        message = ndefMessage.toByteArray().toString(Charsets.UTF_8)
     }
     ndef.close()
     val data = mapOf(kId to id, kContent to message, kError to "", kStatus to "reading")
