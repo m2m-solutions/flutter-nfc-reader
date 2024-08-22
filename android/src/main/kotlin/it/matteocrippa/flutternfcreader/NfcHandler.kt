@@ -104,7 +104,7 @@ private fun Tag.read(callback: (Map<*, *>) -> Unit) {
     val isNfcV = this.techList.contains("android.nfc.tech.NfcV")
     // Get the ID from the tag, reverse only if it's NfcV (ISO 15693)
     val id = if (isNfcV) {
-        // reverse array to convert to big-endian to match CoreNFC implementation of ISO 15693
+        // reverse array to convert to little-endian to match CoreNFC implementation of ISO 15693
         this.getId().reversedArray().bytesToHexString()
     } else {
         this.getId().bytesToHexString()
