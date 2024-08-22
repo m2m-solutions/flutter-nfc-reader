@@ -105,9 +105,9 @@ private fun Tag.read(callback: (Map<*, *>) -> Unit) {
     // Get the ID from the tag, reverse only if it's NfcV (ISO 15693)
     val id = if (isNfcV) {
         // reverse array to convert to big-endian to match CoreNFC implementation of ISO 15693
-        this.id.reversedArray().bytesToHexString()
+        this.getId().reversedArray().bytesToHexString()
     } else {
-        this.id.bytesToHexString()
+        this.getId().bytesToHexString()
     }
     if (ndef == null) {
         callback(mapOf(kId to id, kContent to null, kError to "failed to get NDEF", kStatus to "error"))
